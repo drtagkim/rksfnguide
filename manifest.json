@@ -1,0 +1,21 @@
+{
+	"name":"FN Guide Access Helper",
+	"description":"Taekyung Kim, FnGuide Helper 2019",
+	"version":"0.0.1",
+	"manifest_version":2,
+	"browser_action":{
+		"default_icon":"fnguide.png",
+		"default_title":"FnGuide Download"
+	},
+	"background":{
+		"scripts":["background.js"],
+		"persistent":false
+	},
+	"permissions":[
+		"storage",
+		"activeTab",
+		"http://*/",
+		"https://*/"
+	],
+	"options_page":"options.html"
+}
