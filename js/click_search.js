@@ -6,6 +6,6 @@ chrome.storage.sync.get(["timing1","timing2"],(data)=>{
     let sleeping=timing1+timing2;
     setTimeout(()=>{
         search.click();
-        console.log("search clicked.");
+        //console.log("search clicked.");
     },sleeping);
 });

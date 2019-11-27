@@ -7,6 +7,6 @@ chrome.storage.sync.get(["timing1","timing2","timing3"],(data)=>{
     let sleeping=timing1+timing2+timing3;
     setTimeout(()=>{
         download.click();
-        console.log("file downloading.");
+        //console.log("file downloading.");
     },sleeping);
 });

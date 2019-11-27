@@ -29,12 +29,14 @@ chrome.storage.sync.get("timing1",(data)=>{
             let sd=data.startDate;
             let ed=data.endDate;
             let currentDateLog=data.currentDateLog;
-            console.log(currentDateLog); //test
+            //console.log(currentDateLog); //test
             var listDate = [];
             getDateRange(sd,ed,listDate);
             var date_input=document.querySelector("#tab1DateSingle");
             date_input.value=listDate[currentDateLog];
             chrome.storage.sync.set({currentDateLog:++currentDateLog});
+            chrome.storage.sync.set({date_range:listDate}); //date range updated.
+            
         },timing1);
     });
     

@@ -25,44 +25,64 @@ function getDateRange(startDate, endDate, listDate)
 };
 
 chrome.runtime.onInstalled.addListener(()=>{
+    let sd="2019-10-01";
+    let ed="2019-10-03";
+    let listDate = [];
+    getDateRange(sd,ed,listDate);
     chrome.storage.sync.set({
-        startDate:"2019-10-01",
-        endDate:"2019-10-10",
+        startDate:sd,
+        endDate:ed,
         currentDateLog:0,
-        timing1:500,
-        timing2:1500,
-        timing3:2000,
-        waiting:20000
+        timing1:1000,
+        timing2:2000,
+        timing3:5000,
+        date_range:listDate
     });
+    console.log(`Installation complete.`);
 });
 //
 function doit() {
-    console.log("Activated.");
-    chrome.tabs.query({
-        active:true,
-        currentWindow:true
-    },(tabs)=>{
-        chrome.tabs.executeScript({file:'js/set_date.js'});
-        chrome.tabs.executeScript({file:'js/click_search.js'});
-        chrome.tabs.executeScript({file:'js/click_download.js'});
+    chrome.storage.sync.get(["currentDateLog","date_range"],(data)=>{
+        let i=data.currentDateLog;
+        let n=data.date_range.length;
+        if(i<n) {
+            console.log(`Fire another (${i}/${n}).`);
+            chrome.tabs.query({
+                active:true,
+                currentWindow:true
+            },(tabs)=>{
+                chrome.tabs.executeScript({file:'js/set_date.js'});
+                chrome.tabs.executeScript({file:'js/click_search.js'});
+                chrome.tabs.executeScript({file:'js/click_download.js'});
+            });
+        } else {
+            console.log("Complete.");
+        }
     });
 }
 chrome.browserAction.onClicked.addListener(()=>{
-    chrome.storage.sync.get(["startDate","endDate","timing1","timing2","timing3","waiting"],(data)=>{
-        var listDate = [];
-        let sd=data.startDate;
-        let ed=data.endDate;
-        let timing1=data.timing1;
-        let timing2=data.timing2;
-        let timing3=data.timing3;
-        let waiting=data.waiting;
-        getDateRange(sd,ed,listDate);
-        let time_block=timing1+timing2+timing3+waiting;
-        //console.log("list date: "+listDate);
-        for(let i=0,n=listDate.length;i<n;++i) {
-            if(i===0)  setTimeout(doit,0); //fire first
-            setTimeout(doit,time_block*i);
-            //console.log("fired.");
-        }
+    chrome.storage.sync.set({currentDateLog:0});
+    chrome.storage.sync.get(["startDate","endDate","timing1","timing2","timing3"],(data)=>{
+        doit();
     });
+});
+chrome.downloads.onChanged.addListener((d)=>{
+    if('state' in d && d.state.current==='complete') {
+        doit();
+    }
+});
+chrome.downloads.onDeterminingFilename.addListener(function(item,__suggest) {
+    function suggest(filename,conflictAction) {
+        __suggest({filename:filename,
+            conflictAction:conflictAction,
+            conflict_action:conflictAction});
+    }
+    chrome.storage.sync.get(["currentDateLog","date_range"],(data)=>{
+
+        let d=data.date_range[--data.currentDateLog];
+        let new_filename=`${d}_.xlsx`;
+        //console.log(new_filename);
+        suggest(new_filename,'overwrite');
+    });
+    return true;
 });
