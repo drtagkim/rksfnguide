@@ -36,7 +36,6 @@ chrome.runtime.onInstalled.addListener(()=>{
         timing1:1000,
         timing2:2000,
         timing3:5000,
-        waiting:20000,
         date_range:listDate
     });
     console.log(`Installation complete.`);
@@ -56,30 +55,15 @@ function doit() {
                 chrome.tabs.executeScript({file:'js/click_search.js'});
                 chrome.tabs.executeScript({file:'js/click_download.js'});
             });
+        } else {
+            console.log("Complete.");
         }
     });
 }
 chrome.browserAction.onClicked.addListener(()=>{
     chrome.storage.sync.set({currentDateLog:0});
-    chrome.storage.sync.get(["startDate","endDate","timing1","timing2","timing3","waiting"],(data)=>{
-        var listDate = [];
-        let sd=data.startDate;
-        let ed=data.endDate;
-        let timing1=data.timing1;
-        let timing2=data.timing2;
-        let timing3=data.timing3;
-        let waiting=data.waiting;
-        getDateRange(sd,ed,listDate);
-        let time_block=timing1+timing2+timing3+waiting;
+    chrome.storage.sync.get(["startDate","endDate","timing1","timing2","timing3"],(data)=>{
         doit();
-        //console.log("list date: "+listDate);
-        /*
-        for(let i=0,n=listDate.length;i<n;++i) {
-            if(i===0)  setTimeout(doit,0); //fire first
-            setTimeout(doit,time_block*i);
-            //console.log("fired.");
-        }
-        */
     });
 });
 chrome.downloads.onChanged.addListener((d)=>{
