@@ -71,3 +71,18 @@ chrome.downloads.onChanged.addListener((d)=>{
         doit();
     }
 });
+chrome.downloads.onDeterminingFilename.addListener(function(item,__suggest) {
+    function suggest(filename,conflictAction) {
+        __suggest({filename:filename,
+            conflictAction:conflictAction,
+            conflict_action:conflictAction});
+    }
+    chrome.storage.sync.get(["currentDateLog","date_range"],(data)=>{
+
+        let d=data.date_range[--data.currentDateLog];
+        let new_filename=`${d}_.xlsx`;
+        //console.log(new_filename);
+        suggest(new_filename,'overwrite');
+    });
+    return true;
+});
