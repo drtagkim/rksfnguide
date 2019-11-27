@@ -13,7 +13,8 @@ update.addEventListener("click",(e)=>{
     chrome.storage.sync.set({
         startDate:sd.value,
         endDate:ed.value,
-        waiting:1000*parseInt(wt.value)
+        waiting:1000*parseInt(wt.value),
+        currentDateLog:0
     },()=>{
         let msg=$("#msg");
         msg.text("Information updated.");
