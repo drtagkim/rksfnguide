@@ -35,16 +35,19 @@ chrome.runtime.onInstalled.addListener(()=>{
         currentDateLog:0,
         timing1:1000,
         timing2:1000,
-        timing3:5000,
-        date_range:listDate
+        timing3:5000
     });
     console.log(`Installation complete.`);
 });
 //
 function doit(isfirst) {
-    chrome.storage.sync.get(["currentDateLog","date_range"],(data)=>{
+    chrome.storage.sync.get(["currentDateLog","startDate","endDate"],(data)=>{
+        let listDate = [];
+        let sd=data.startDate;
+        let ed=data.endDate;
+        getDateRange(sd,ed,listDate);        
         let i=data.currentDateLog;
-        let n=data.date_range.length;
+        let n=listDate.length;
         if(i<n) {
             if(isfirst) {
                 console.log("Fire first.");
@@ -67,18 +70,20 @@ function doit(isfirst) {
 }
 chrome.browserAction.onClicked.addListener(()=>{
     chrome.storage.sync.set({currentDateLog:0});
-    chrome.storage.sync.get(["startDate","endDate","timing1","timing2","timing3"],(data)=>{
-        doit(true);
-    });
+    doit(true);
 });
 chrome.downloads.onChanged.addListener((d)=>{
     if('state' in d && d.state.current==='complete') {
-        setTimeout(doit(false),1500);
+        doit(false);
     }
 });
 chrome.downloads.onDeterminingFilename.addListener(function(item,__suggest) {
-    chrome.storage.sync.get(["currentDateLog","date_range"],(data)=>{
-        let d=data.date_range[--data.currentDateLog];
+    chrome.storage.sync.get(["currentDateLog","startDate","endDate"],(data)=>{
+        let listDate = [];
+        let sd=data.startDate;
+        let ed=data.endDate;
+        getDateRange(sd,ed,listDate);
+        let d=listDate[--data.currentDateLog];
         let new_filename=`${d}.xls`;
         //console.log(chrome.runtime.lastError);
         __suggest({filename:new_filename},"uniquify");
